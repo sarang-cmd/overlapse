@@ -1,5 +1,6 @@
 # Overlapse
 
+[![Live Preview](https://img.shields.io/badge/Live_Preview-Deployed_App-brightgreen?style=for-the-badge&logo=firebase)](https://overlapse-dev.web.app) 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.10-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.4-blue?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -7,18 +8,71 @@
 [![Supabase](https://img.shields.io/badge/Supabase-V2-green?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-Overlapse is a modern web application built with Next.js, designed to help users manage and coordinate meetings across different timezones. It aims to simplify the complexities of scheduling by providing intuitive tools and a clean user interface.
+Overlapse is a sophisticated web application built using the Next.js framework, meticulously designed to alleviate the complexities of scheduling and coordinating meetings across diverse timezones. In an increasingly globalized world, effective cross-timezone communication is paramount. Overlapse addresses this challenge by providing an intuitive, real-time platform that streamlines the process of finding optimal meeting slots, managing invites, and ensuring all participants are synchronized, regardless of their geographical location.
+
+Our vision for Overlapse is to create a frictionless meeting coordination experience, empowering teams and individuals to collaborate more efficiently and reduce the time lost to scheduling conflicts. With a focus on user experience, performance, and scalability, Overlapse leverages modern web technologies to deliver a robust and reliable solution.
 
 ## Features
 
-- **Timezone Coordination:** Easily find optimal meeting times across multiple timezones.
-- **Meeting Management:** Create, view, and manage your meetings with ease.
-- **Responsive Design:** A seamless experience across all devices.
-- **Real-time Updates:** Stay synchronized with the latest meeting changes.
+- **Intelligent Timezone Coordination:** Advanced algorithms to suggest the best meeting times, minimizing overlap and maximizing attendance across various time zones.
+- **Comprehensive Meeting Management:** Create, edit, delete, and view meetings with a rich set of details, including attendees, agendas, and attached resources.
+- **Real-time Synchronization:** Instant updates for all meeting changes, ensuring everyone has the most current information.
+- **Interactive Calendar View:** A dynamic and user-friendly calendar interface for visualizing schedules and availability.
+- **User Authentication & Authorization:** Secure user sign-up and login, with role-based access control for meeting management.
+- **Responsive and Adaptive UI/UX:** A meticulously crafted user interface that provides an optimal viewing and interaction experience across a wide range of devices, from desktops to mobile phones.
+- **Integration with External Calendars (Future):** Planned support for syncing with popular calendar services.
+
+## Core Concepts and Architecture
+
+Overlapse is built upon a modern, full-stack architecture designed for performance and scalability:
+
+*   **Next.js (Frontend & Backend):** Utilized for its powerful React framework, enabling both static site generation (SSG) for fast initial loads and server-side rendering (SSR) capabilities for dynamic content. The App Router handles routing and data fetching.
+*   **Firebase (Hosting):** Provides fast and secure hosting for the statically exported Next.js application, ensuring global content delivery.
+*   **Supabase (Database & Authentication):** A robust open-source alternative to Firebase, offering a PostgreSQL database, real-time subscriptions, and a comprehensive authentication system. Supabase handles user management and all application data.
+*   **Tailwind CSS (Styling):** A utility-first CSS framework for rapidly building custom designs without leaving your HTML.
 
 ## Getting Started
 
-First, run the development server:
+To get Overlapse up and running on your local machine, follow these steps:
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+*   Node.js (LTS version recommended)
+*   npm or Yarn
+*   Git
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/sarang-cmd/overlapse.git
+    cd overlapse
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+### Environment Variables
+
+Create a `.env.local` file in the root of your project and add the following environment variables, which are essential for connecting to your Supabase project:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
+
+*   **`NEXT_PUBLIC_SUPABASE_URL`**: The URL of your Supabase project. You can find this in your Supabase project settings under "API".
+*   **`NEXT_PUBLIC_SUPABASE_ANON_KEY`**: Your Supabase "anon" key. This is a public key that allows unauthenticated access to your Supabase project (e.g., for user sign-up/login). Found in the same "API" settings page.
+
+### Running Locally
+
+Once the dependencies are installed and environment variables are set, you can start the development server:
 
 ```bash
 npm run dev
@@ -30,47 +84,67 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. The application will hot-reload as you make changes to the code.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Script Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*   `npm run dev`: Starts the development server with hot-reloading.
+*   `npm run build`: Creates an optimized production build of the application for static export.
+*   `npm run start`: Serves the statically built application locally (after running `npm run build`).
+*   `npm run lint`: Runs ESLint to check for code quality and style issues.
 
 ## Technologies Used
 
 *   **Framework:** Next.js (16.2.10)
 *   **Language:** TypeScript (5+)
 *   **Styling:** Tailwind CSS (4.0)
-*   **Database/Auth:** Supabase (V2)
-*   **Backend Services:** Firebase (V9)
-*   **UI Components:** Shadcn UI, Radix UI
-*   **Animation:** Framer Motion, GSAP
-*   **Globe Visualization:** Globe.gl
-*   **Date/Time:** Luxon, RRule
+*   **Database/Auth:** Supabase (V2) - PostgreSQL, Realtime, Authentication
+*   **Hosting:** Firebase (V9) - Static content hosting
+*   **UI Components:** Shadcn UI, Radix UI - Accessible and customizable UI components
+*   **Animation:** Framer Motion, GSAP - Advanced animation libraries for fluid user experiences
+*   **Globe Visualization:** Globe.gl - Interactive 3D globe for timezone visualization
+*   **Date/Time:** Luxon, RRule - Powerful libraries for date, time, and recurrence rule management
 
 ## Deployment
 
-This application is configured for static export and deployment to Firebase Hosting (Classic).
+This application is configured for static export and deployment to Firebase Hosting (Classic). Please ensure your Firebase project is set up correctly.
 
-1.  **Build the Next.js application:**
+1.  **Build the Next.js application for static export:**
     ```bash
     npm run build
     ```
+    This command will generate the static HTML, CSS, and JavaScript files in the `out` directory.
+
 2.  **Deploy to Firebase Hosting:**
     ```bash
     firebase deploy --only hosting
     ```
-    (Or `npx -y firebase-tools@latest deploy --only hosting`)
+    (Or `npx -y firebase-tools@latest deploy --only hosting` if the Firebase CLI is not globally installed.)
+
+    This command uploads the contents of the `out` directory to your Firebase Hosting instance.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the core technologies used in this project, refer to their official documentation:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
+
+We welcome contributions to Overlapse! If you have suggestions, bug reports, or want to contribute code, please feel free to:
+
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/your-feature-name`).
+3.  Make your changes.
+4.  Commit your changes (`git commit -m 'feat: Add new feature'`).
+5.  Push to the branch (`git push origin feature/your-feature-name`).
+6.  Open a Pull Request.
+
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
 ## License
 
-[MIT License](LICENSE) (if applicable, otherwise state your license or "No License")
+This project is licensed under the [MIT License](LICENSE).
