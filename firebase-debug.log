@@ -1,0 +1,29 @@
+[debug] [2026-07-03T22:36:01.662Z] ----------------------------------------------------------------------
+[debug] [2026-07-03T22:36:01.664Z] Command:       /usr/local/share/nvm/versions/node/v24.14.0/bin/node /home/codespace/nvm/current/bin/firebase deploy --only hosting
+[debug] [2026-07-03T22:36:01.664Z] CLI Version:   15.22.4
+[debug] [2026-07-03T22:36:01.665Z] Platform:      linux
+[debug] [2026-07-03T22:36:01.665Z] Node Version:  v24.14.0
+[debug] [2026-07-03T22:36:01.665Z] Detected Agent: unknown
+[debug] [2026-07-03T22:36:01.665Z] Time:          Fri Jul 03 2026 22:36:01 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-07-03T22:36:01.665Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-03T22:36:03.291Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-03T22:36:03.291Z] > authorizing via signed-in user (sar.brawlstars@gmail.com)
+[debug] [2026-07-03T22:36:03.291Z] [iam] checking project overlapse-dev for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-03T22:36:03.292Z] Checked if tokens are valid: true, expires at: 1783121250629
+[debug] [2026-07-03T22:36:03.292Z] Checked if tokens are valid: true, expires at: 1783121250629
+[debug] [2026-07-03T22:36:03.293Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/overlapse-dev:testIamPermissions [none]
+[debug] [2026-07-03T22:36:03.293Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/overlapse-dev:testIamPermissions  x-goog-user-project=overlapse-dev
+[debug] [2026-07-03T22:36:03.293Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/overlapse-dev:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-07-03T22:36:03.470Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/overlapse-dev:testIamPermissions 200
+[debug] [2026-07-03T22:36:03.470Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/overlapse-dev:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-07-03T22:36:03.471Z] Checked if tokens are valid: true, expires at: 1783121250629
+[debug] [2026-07-03T22:36:03.471Z] Checked if tokens are valid: true, expires at: 1783121250629
+[debug] [2026-07-03T22:36:03.471Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/overlapse-dev [none]
+[debug] [2026-07-03T22:36:03.781Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/overlapse-dev 200
+[debug] [2026-07-03T22:36:03.781Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/overlapse-dev {"projectId":"overlapse-dev","projectNumber":"931403457692","displayName":"overlapse-dev","name":"projects/overlapse-dev","resources":{"hostingSite":"overlapse-dev"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_c63cd1aa-85c5-49ee-886e-87e8ca6a5999"}
+[info] 
+[info] === Deploying to 'overlapse-dev'...
+[info] 
+[info] i  deploying hosting 
+[info] Running command: npm run build
