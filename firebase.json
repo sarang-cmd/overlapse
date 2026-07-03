@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public",
+    "public": "out",
     "predeploy": [
       "npm run build"
     ],
@@ -8,6 +8,24 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/dashboard",
+        "destination": "/dashboard.html"
+      },
+      {
+        "source": "/groups",
+        "destination": "/groups.html"
+      },
+      {
+        "source": "/meetings",
+        "destination": "/meetings.html"
+      },
+      {
+        "source": "/settings",
+        "destination": "/settings.html"
+      }
     ]
   }
-}
+} 
