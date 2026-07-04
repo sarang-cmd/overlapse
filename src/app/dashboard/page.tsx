@@ -8,21 +8,22 @@ import { SchedulePanel } from '@/components/overlapse/schedule';
 import { CalendarPanel } from '@/components/overlapse/calendar-panel';
 import { UpcomingMeetings } from '@/components/overlapse/upcoming-meetings';
 import Toaster, { ToasterRef } from '@/components/ui/toast';
-import { Search, User, Globe } from 'lucide-react';
+import { Search, User, Globe, RotateCcw, Layers, MapPin } from 'lucide-react';
 
-const OverlapseGlobe = dynamic(() => import('@/components/overlapse/globe').then(m=>m.OverlapseGlobe), { ssr: false, loading: () => <div className="h-[520px] rounded-[28px] bg-[#0b0c10] border border-white/10 flex items-center justify-center text-zinc-500 text-xs" style={{fontFamily:'"Fragment Mono",monospace'}}>loading Globe.gl…</div> });
+const MapboxGlobe = dynamic(() => import('@/components/overlapse/MapboxGlobe').then(m=>m.default), { ssr: false, loading: () => <div className="h-[520px] rounded-[28px] bg-[#0b0c10] border border-white/10 flex items-center justify-center text-zinc-500 text-xs" style={{fontFamily:'"Fragment Mono",monospace'}}>loading Mapbox GL…</div> });
 
 export default function DashboardPage() {
   const toasterRef = useRef<ToasterRef>(null);
-  const [focusLabel, setFocusLabel] = useState('Argentina');
-  const [focusCoords, setFocusCoords] = useState({ lat: -34.6, lng: -58.4 });
+  const [focusLabel, setFocusLabel] = useState('World');
+  const [focusCoords, setFocusCoords] = useState({ lat: -34.6, lng: -58.4, zoom: 2 });
+  const [autoRotate, setAutoRotate] = useState(false);
 
   const pins = [
-    { lat: -34.6118, lng: -58.396, label: 'Buenos Aires', color: '#ff6a1a', size: 0.9 },
-    { lat: -31.42, lng: -64.18, label: 'Córdoba', color: '#00e0ff', size: 0.6 },
-    { lat: 40.7128, lng: -74.006, label: 'New York', color: '#7cffb0', size: 0.55 },
-    { lat: 35.6762, lng: 139.65, label: 'Tokyo', color: '#ffd166', size: 0.55 },
-    { lat: 51.0504, lng: 13.7373, label: 'Dresden', color: '#c084fc', size: 0.55 },
+    { id: '1', lat: -34.6118, lng: -58.396, label: 'Buenos Aires', color: '#ff6a1a', size: 1 },
+    { id: '2', lat: -31.42, lng: -64.18, label: 'Córdoba', color: '#00e0ff', size: 0.8 },
+    { id: '3', lat: 40.7128, lng: -74.006, label: 'New York', color: '#7cffb0', size: 0.8 },
+    { id: '4', lat: 35.6762, lng: 139.65, label: 'Tokyo', color: '#ffd166', size: 0.8 },
+    { id: '5', lat: 51.0504, lng: 13.7373, label: 'Dresden', color: '#c084fc', size: 0.8 },
   ];
 
   return (
@@ -69,16 +70,22 @@ export default function DashboardPage() {
 
         {/* Center – Globe */}
         <section className="col-span-12 lg:col-span-6 xl:col-span-7">
-          <OverlapseGlobe
+          <MapboxGlobe
             pins={pins}
             focus={{ ...focusCoords, label: focusLabel }}
             height={520}
+            autoRotate={autoRotate}
+            onAutoRotateChange={setAutoRotate}
+            onLocationChange={(loc) => {
+              setFocusCoords({ lat: loc.lat, lng: loc.lng, zoom: loc.zoom });
+              setFocusLabel(loc.label);
+            }}
             onPinClick={(p)=>{
-              setFocusCoords({lat:p.lat, lng:p.lng});
+              setFocusCoords({lat:p.lat, lng:p.lng, zoom: 6});
               setFocusLabel(p.label);
               toasterRef.current?.show({
                 title: `Focused: ${p.label}`,
-                message: `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)} • Globe.gl night-lights`,
+                message: `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)} • Mapbox GL`,
                 variant: 'default',
                 duration: 2200
               });
@@ -141,6 +148,7 @@ export default function DashboardPage() {
               ['FCM Push','Firebase Cloud Messaging • free unlimited','border-white/15'],
               ['Resend Email','3k/mo free • DB webhook trigger','border-white/15'],
               ['shadcn UI Kit','CinematicHero • Toast • Button','border-[#ff6a1a]/25'],
+              ['World Clock','Multiple timezones • worldtimeapi.org','border-[#7cffb0]/25'],
               ['RLS Policies','profiles/groups/members/suggestions','border-[#00e0ff]/25'],
               ['Saved Locations','saved_locations pins table','border-white/15'],
               ['90d Auto-Delete','is_premium = true bypass','border-white/15'],
@@ -161,7 +169,7 @@ export default function DashboardPage() {
       </main>
 
       <footer className="border-t border-white/10 mt-10 py-8 text-center text-[10px] text-zinc-500" style={{fontFamily:'"Fragment Mono", monospace'}}>
-        Overlapse — timezone mission control • #0a0a0f • #ff6a1a • #00e0ff • Fragment Mono / Departure Mono • Supabase • Globe.gl • Vercel
+        Overlapse — timezone mission control • #0a0a0f • #ff6a1a • #00e0ff • Fragment Mono / Departure Mono • Supabase • Mapbox GL • Vercel
       </footer>
     </div>
   );
