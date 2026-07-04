@@ -1,0 +1,19 @@
+{
+  "name": "overlapse-news-worker",
+  "version": "1.0.0",
+  "description": "Free RSS news aggregator for Overlapse — fetches from CNBC, NBC, ABC, BBC, NYT, Times of India, Süddeutsche Zeitung, Guardian, Al Jazeera, CNN, Reuters, FT. Caches in Cloudflare KV. Zero cost.",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240620.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.60.0"
+  }
+}
