@@ -15,20 +15,22 @@ interface NewsArticle {
 }
 
 const NEWS_SOURCES = [
-  { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'World' },
-  { name: 'CNN World', url: 'http://rss.cnn.com/rss/edition_world.rss', category: 'World' },
-  { name: 'Reuters World', url: 'https://www.reuters.com/world/rss', category: 'World' },
-  { name: 'NY Times World', url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', category: 'World' },
-  { name: 'CNBC World', url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html', category: 'Business' },
-  { name: 'Financial Times', url: 'https://www.ft.com/rss/home/world', category: 'Business' },
-  { name: 'ABC News', url: 'https://abcnews.go.com/abcnews/internationalheadlines', category: 'World' },
-  { name: 'NBC News', url: 'https://feeds.nbcnews.com/nbcnews/public/world', category: 'World' },
-  { name: 'Times of India', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', category: 'World' },
-  { name: 'Süddeutsche Zeitung', url: 'https://rss.sueddeutsche.de/rss/Topthemen', category: 'World' },
-  { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss', category: 'World' },
-  { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'World' },
+  { id: 'cnbc', name: 'CNBC', url: 'https://www.cnbc.com/id/100727362/device/rss/rss.html', category: 'Business' },
+  { id: 'nbc', name: 'NBC News', url: 'https://feeds.nbcnews.com/nbcnews/public/news', category: 'World' },
+  { id: 'abc', name: 'ABC News', url: 'https://rssfeeds.abcnews.com/abcnews/internationalheadlines', category: 'World' },
+  { id: 'bbc', name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'World' },
+  { id: 'nyt', name: 'NY Times', url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', category: 'World' },
+  { id: 'toi', name: 'Times of India', url: 'https://timesofindia.indiatimes.com/rssfeeds/296589292.cms', category: 'World' },
+  { id: 'sz', name: 'Süddeutsche Zeitung', url: 'https://rss.sueddeutsche.de/rss/Topthemen', category: 'World' },
+  { id: 'guardian', name: 'The Guardian', url: 'https://www.theguardian.com/world/rss', category: 'World' },
+  { id: 'aljazeera', name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'World' },
+  { id: 'reuters', name: 'Reuters', url: 'https://www.reutersagency.com/feed/?best-topics=top-news&post_type=best', category: 'World' },
+  { id: 'cnn', name: 'CNN World', url: 'http://rss.cnn.com/rss/edition_world.rss', category: 'World' },
+  { id: 'ft', name: 'Financial Times', url: 'https://www.ft.com/rss/home/world', category: 'Business' },
 ];
 
+// Worker URL — if set, fetch from Cloudflare Worker (production). Otherwise fallback to direct RSS via allorigins (dev).
+const NEWS_WORKER_URL = process.env.NEXT_PUBLIC_NEWS_WORKER_URL || '';
 const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
 export function LatestNews({ maxItems = 10 }: { maxItems?: number }) {
@@ -45,9 +47,28 @@ export function LatestNews({ maxItems = 10 }: { maxItems?: number }) {
     setError(null);
     
     try {
-      const allArticles: NewsArticle[] = [];
+      // Strategy A: Cloudflare Worker (production) — fast, cached, deduped
+      if (NEWS_WORKER_URL) {
+        try {
+          const res = await fetch(
+            `${NEWS_WORKER_URL}/api/news?limit=${maxItems * 2}${selectedCategory !== 'All' ? `&category=${selectedCategory}` : ''}`,
+            { signal: AbortSignal.timeout(8000) }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (data.articles && Array.isArray(data.articles)) {
+              setArticles(data.articles);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (err) {
+          console.warn('Worker fetch failed, falling back to direct RSS:', err);
+        }
+      }
       
-      // Fetch from multiple sources in parallel
+      // Strategy B: Direct RSS via allorigins proxy (dev fallback)
+      const allArticles: NewsArticle[] = [];
       const fetchPromises = NEWS_SOURCES.map(async (source) => {
         try {
           const response = await fetch(`${CORS_PROXY}${encodeURIComponent(source.url)}`, {

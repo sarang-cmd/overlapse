@@ -337,14 +337,14 @@ export function MapboxGlobe({
             'text-field': ['get', 'label'],
             'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
             'text-size': 11,
-            'text-color': '#ffffff',
-            'text-halo-color': '#06070b',
-            'text-halo-width': 2,
             'text-anchor': 'top',
             'text-offset': [0, 1.2],
             'text-allow-overlap': true,
           },
           paint: {
+            'text-color': '#ffffff',
+            'text-halo-color': '#06070b',
+            'text-halo-width': 2,
             'text-opacity': [
               'interpolate',
               ['linear'],
@@ -408,13 +408,15 @@ export function MapboxGlobe({
     map.on('mousemove', 'pin-circles', (e) => {
       if (e.features && e.features.length > 0) {
         const feature = e.features[0];
+        const props = feature.properties ?? {};
+        const coords = (feature.geometry as any)?.coordinates ?? [0, 0];
         const pin: Pin = {
-          id: feature.properties.id,
-          lat: feature.geometry.coordinates[1],
-          lng: feature.geometry.coordinates[0],
-          label: feature.properties.label,
-          color: feature.properties.color,
-          size: feature.properties.size,
+          id: props.id ?? '',
+          lat: coords[1],
+          lng: coords[0],
+          label: props.label ?? '',
+          color: props.color,
+          size: props.size,
         };
         setHoveredPin(pin);
         map.getCanvas().style.cursor = 'pointer';
@@ -430,13 +432,15 @@ export function MapboxGlobe({
     map.on('click', 'pin-circles', (e) => {
       if (e.features && e.features.length > 0) {
         const feature = e.features[0];
+        const props = feature.properties ?? {};
+        const coords = (feature.geometry as any)?.coordinates ?? [0, 0];
         const pin: Pin = {
-          id: feature.properties.id,
-          lat: feature.geometry.coordinates[1],
-          lng: feature.geometry.coordinates[0],
-          label: feature.properties.label,
-          color: feature.properties.color,
-          size: feature.properties.size,
+          id: props.id ?? '',
+          lat: coords[1],
+          lng: coords[0],
+          label: props.label ?? '',
+          color: props.color,
+          size: props.size,
         };
         onPinClick?.(pin);
       }

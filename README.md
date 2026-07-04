@@ -1,150 +1,159 @@
 # Overlapse
 
-[![Live Preview](https://img.shields.io/badge/Live_Preview-Deployed_App-brightgreen?style=for-the-badge&logo=firebase)](https://overlapse-dev.web.app) 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.10-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.4-blue?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Firebase](https://img.shields.io/badge/Firebase-V9-orange?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-V2-green?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-Overlapse is a sophisticated web application built using the Next.js framework, meticulously designed to alleviate the complexities of scheduling and coordinating meetings across diverse timezones. In an increasingly globalized world, effective cross-timezone communication is paramount. Overlapse addresses this challenge by providing an intuitive, real-time platform that streamlines the process of finding optimal meeting slots, managing invites, and ensuring all participants are synchronized, regardless of their geographical location.
+**Overlapse** is a free, personal-scale, cross-platform timezone-coordination and meeting-scheduling tool for distributed groups. Mission-control HUD aesthetic with a live 3D globe, real-time messaging, Golden Hours overlap engine, live flight tracking, and calendar sync.
 
-Our vision for Overlapse is to create a frictionless meeting coordination experience, empowering teams and individuals to collaborate more efficiently and reduce the time lost to scheduling conflicts. With a focus on user experience, performance, and scalability, Overlapse leverages modern web technologies to deliver a robust and reliable solution.
+## What's shipped (v1)
 
-## Features
+### Core features
+- **3D interactive globe** (globe.gl + Three.js) with free Esri World Imagery tiles — Google-Earth-quality progressive zoom, no Mapbox token needed
+- **Real 3D extruded pin markers** colored by live day/night status at each location (NOAA solar position algorithm)
+- **Zoom-aware location label** ("Zoomed in on: Tokyo, Japan") via reverse-geocoding against bundled cities dataset (~500 cities)
+- **Auto-rotate toggle** on the dashboard
+- **7 free map layers**: ⭐ NASA Black Marble, ⭐ Esri Satellite, NASA Blue Marble, OpenStreetMap, OpenTopoMap, Esri Streets, Esri Topographic
+- **Live flight tracking** (OpenSky Network) — aircraft rendered as SVG icons or 3D models, colored by altitude, polled every 15s
+- **"Search The World" pill** — search any city, fly the globe to it
+- **World Clock** — multiple timezones, computed locally via `Intl.DateTimeFormat` + Luxon (zero API calls, DST-safe)
+- **Supabase Auth** — email/password + Google OAuth + magic link
+- **Profile menu** with sign-in/sign-up/settings/sign-out
+- **Real settings page** with 5 tabs (Profile, World Clock, Map & Globe, Notifications, Account)
+- **Firebase Cloud Messaging** (FCM) push notifications
+- **Cloudflare News Worker** — RSS aggregator fetching from CNBC, NBC, ABC, BBC, NYT, Times of India, Süddeutsche Zeitung, Guardian, Al Jazeera, Reuters, CNN, FT
+- **Supabase Edge Function** for iCal export (deployable from web UI, no wrangler)
+- **Golden Hours overlap engine** — Luxon-based, DST-safe, computes optimal meeting times across timezones
+- **Draggable meeting blocks** (@dnd-kit) with manual input fallback
+- **RRULE recurring meeting support**
+- **Real-time suggestions** via Supabase Realtime (postgres_changes)
+- **Cinematic GSAP landing hero** + **Sonner/Framer Motion toast system**
 
-- **Intelligent Timezone Coordination:** Advanced algorithms to suggest the best meeting times, minimizing overlap and maximizing attendance across various time zones.
-- **Comprehensive Meeting Management:** Create, edit, delete, and view meetings with a rich set of details, including attendees, agendas, and attached resources.
-- **Real-time Synchronization:** Instant updates for all meeting changes, ensuring everyone has the most current information.
-- **Interactive Calendar View:** A dynamic and user-friendly calendar interface for visualizing schedules and availability.
-- **User Authentication & Authorization:** Secure user sign-up and login, with role-based access control for meeting management.
-- **Responsive and Adaptive UI/UX:** A meticulously crafted user interface that provides an optimal viewing and interaction experience across a wide range of devices, from desktops to mobile phones.
-- **Integration with External Calendars (Future):** Planned support for syncing with popular calendar services.
+### Tech stack
+| Layer | Service/Library | Free tier |
+|---|---|---|
+| Frontend | Next.js 16 + React 19 + TypeScript + Tailwind v4 + shadcn/ui | Open source |
+| Globe | globe.gl + Three.js + Esri World Imagery | Free, no API key |
+| Database + Auth + Realtime | Supabase | 500 MB DB, 50k MAU |
+| Flight data | OpenSky Network | 400 req/day anon, 4k/day registered |
+| Push notifications | Firebase Cloud Messaging | Unlimited |
+| News | Cloudflare Worker + RSS | 100k req/day |
+| Calendar export | Supabase Edge Function | Included |
+| Hosting | Firebase Hosting (static export) | Free |
 
-## Core Concepts and Architecture
+## Quick start
 
-Overlapse is built upon a modern, full-stack architecture designed for performance and scalability:
-
-*   **Next.js (Frontend & Backend):** Utilized for its powerful React framework, enabling both static site generation (SSG) for fast initial loads and server-side rendering (SSR) capabilities for dynamic content. The App Router handles routing and data fetching.
-*   **Firebase (Hosting):** Provides fast and secure hosting for the statically exported Next.js application, ensuring global content delivery.
-*   **Supabase (Database & Authentication):** A robust open-source alternative to Firebase, offering a PostgreSQL database, real-time subscriptions, and a comprehensive authentication system. Supabase handles user management and all application data.
-*   **Tailwind CSS (Styling):** A utility-first CSS framework for rapidly building custom designs without leaving your HTML.
-
-## Getting Started
-
-To get Overlapse up and running on your local machine, follow these steps:
-
-### Prerequisites
-
-Ensure you have the following installed:
-
-*   Node.js (LTS version recommended)
-*   npm or Yarn
-*   Git
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/sarang-cmd/overlapse.git
-    cd overlapse
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or
-    yarn install
-    ```
-
-### Environment Variables
-
-Create a `.env.local` file in the root of your project and add the following environment variables, which are essential for connecting to your Supabase project:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+### 1. Install dependencies
+```bash
+npm install
 ```
 
-*   **`NEXT_PUBLIC_SUPABASE_URL`**: The URL of your Supabase project. You can find this in your Supabase project settings under "API".
-*   **`NEXT_PUBLIC_SUPABASE_ANON_KEY`**: Your Supabase "anon" key. This is a public key that allows unauthenticated access to your Supabase project (e.g., for user sign-up/login). Found in the same "API" settings page.
+### 2. Configure environment
+```bash
+cp .env.example .env.local
+# Edit .env.local with your real keys (see SETUP.md for the full walkthrough)
+```
 
-### Running Locally
+### 3. Run the database migration
+1. Open Supabase → SQL Editor → New Query
+2. Paste contents of `supabase/migrations/0001_initial.sql`
+3. Run — creates 7 tables + RLS policies + triggers + realtime
 
-Once the dependencies are installed and environment variables are set, you can start the development server:
-
+### 4. Run the dev server
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Open http://localhost:3000
+
+### 5. (Optional) Deploy Cloudflare News Worker
+See `news-worker/README.md` — 5 minute deploy.
+
+### 6. (Optional) Deploy iCal Edge Function
+See `supabase/functions/README.md` — deploy from Supabase Dashboard web UI.
+
+## Documentation
+
+- [`SETUP.md`](./SETUP.md) — Full setup walkthrough (accounts, keys, deploy)
+- [`.env.example`](./.env.example) — Every env var documented
+- [`news-worker/README.md`](./news-worker/README.md) — Cloudflare Worker deploy guide
+- [`supabase/functions/README.md`](./supabase/functions/README.md) — Supabase Edge Function deploy guide
+
+## Architecture
+
+```
+src/
+├── app/
+│   ├── layout.tsx              # Root layout, wraps app in AuthProvider
+│   ├── page.tsx                # Landing (cinematic GSAP hero)
+│   ├── dashboard/page.tsx      # Mission control HUD (3-column grid)
+│   ├── groups/page.tsx         # Group management + Golden Hours demo
+│   ├── meetings/page.tsx       # RRULE demo + iCal preview
+│   ├── settings/page.tsx       # Real settings (5 tabs)
+│   └── auth/
+│       ├── sign-in/page.tsx
+│       ├── sign-up/page.tsx
+│       └── callback/page.tsx   # OAuth redirect handler
+├── components/
+│   ├── overlapse/
+│   │   ├── WorldGlobe.tsx              # NEW: globe.gl + Esri + 3D pins + layers
+│   │   ├── profile-menu.tsx            # NEW: Radix dropdown w/ auth
+│   │   ├── world-clock.tsx             # REWRITE: Intl-based, no API
+│   │   ├── push-notification-manager.tsx # NEW: FCM permission flow
+│   │   ├── latest-news.tsx             # UPDATED: Worker-first, RSS fallback
+│   │   ├── messages.tsx                # Realtime suggestion panel
+│   │   ├── schedule.tsx                # Golden Hours UI
+│   │   ├── calendar-panel.tsx
+│   │   ├── upcoming-meetings.tsx
+│   │   ├── draggable-meeting.tsx
+│   │   ├── globe.tsx                   # Legacy (not used in dashboard)
+│   │   └── MapboxGlobe.tsx             # Legacy (deprecated, kept for reference)
+│   └── ui/
+│       ├── cinematic-hero.tsx          # GSAP scroll hero
+│       ├── cinematic-landing-hero.tsx
+│       ├── toast.tsx                   # Sonner + Framer Motion
+│       └── button.tsx                  # shadcn Button
+└── lib/
+    ├── supabase/
+    │   ├── client.ts                   # Supabase client + Realtime helper
+    │   └── auth.tsx                    # AuthProvider + useAuth + useUser
+    ├── opensky/
+    │   ├── client.ts                   # OAuth2 client (server-side)
+    │   └── use-flight-tracking.ts      # Client hook (anon endpoint)
+    ├── firebase/
+    │   └── messaging.ts                # FCM token + onMessage
+    ├── overlapse/
+    │   ├── golden-hours.ts             # Luxon overlap engine
+    │   ├── sun-position.ts             # NEW: NOAA solar position
+    │   └── zoom-label.ts               # NEW: reverse-geocode zoom label
+    ├── data/
+    │   └── cities.json                 # NEW: ~500 world cities
+    └── utils.ts                        # cn() helper
+
+news-worker/                            # NEW: Cloudflare Worker
+├── src/index.ts                        # RSS aggregator + KV cache
+├── wrangler.toml                       # Deploy config
+├── package.json
+├── tsconfig.json
+└── README.md
+
+supabase/
+├── migrations/
+│   └── 0001_initial.sql                # NEW: schema + RLS + triggers
+└── functions/
+    └── ical-export/index.ts            # NEW: iCal Edge Function
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. The application will hot-reload as you make changes to the code.
+## Cost
 
-## Script Commands
-
-*   `npm run dev`: Starts the development server with hot-reloading.
-*   `npm run build`: Creates an optimized production build of the application for static export.
-*   `npm run start`: Serves the statically built application locally (after running `npm run build`).
-*   `npm run lint`: Runs ESLint to check for code quality and style issues.
-
-## Technologies Used
-
-*   **Framework:** Next.js (16.2.10)
-*   **Language:** TypeScript (5+)
-*   **Styling:** Tailwind CSS (4.0)
-*   **Database/Auth:** Supabase (V2) - PostgreSQL, Realtime, Authentication
-*   **Hosting:** Firebase (V9) - Static content hosting
-*   **UI Components:** Shadcn UI, Radix UI - Accessible and customizable UI components
-*   **Animation:** Framer Motion, GSAP - Advanced animation libraries for fluid user experiences
-*   **Globe Visualization:** Globe.gl - Interactive 3D globe for timezone visualization
-*   **Date/Time:** Luxon, RRule - Powerful libraries for date, time, and recurrence rule management
-
-## Deployment
-
-This application is configured for static export and deployment to Firebase Hosting (Classic). Please ensure your Firebase project is set up correctly.
-
-1.  **Build the Next.js application for static export:**
-    ```bash
-    npm run build
-    ```
-    This command will generate the static HTML, CSS, and JavaScript files in the `out` directory.
-
-2.  **Deploy to Firebase Hosting:**
-    ```bash
-    firebase deploy --only hosting
-    ```
-    (Or `npx -y firebase-tools@latest deploy --only hosting` if the Firebase CLI is not globally installed.)
-
-    This command uploads the contents of the `out` directory to your Firebase Hosting instance.
-
-## Learn More
-
-To learn more about the core technologies used in this project, refer to their official documentation:
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-
-## Contributing
-
-We welcome contributions to Overlapse! If you have suggestions, bug reports, or want to contribute code, please feel free to:
-
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes.
-4.  Commit your changes (`git commit -m 'feat: Add new feature'`).
-5.  Push to the branch (`git push origin feature/your-feature-name`).
-6.  Open a Pull Request.
-
-Please ensure your code adheres to the project's coding standards and includes appropriate tests.
+**$0/month** for personal-scale usage. All services are on free tiers:
+- Supabase: 500 MB DB, 50k MAU, unlimited API, 2 Edge Functions
+- Cloudflare Workers: 100k req/day, KV 100k reads + 1k writes/day
+- OpenSky: 4,000 req/day (registered tier)
+- Firebase Hosting + FCM: unlimited
+- Esri World Imagery: free public tile service
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT

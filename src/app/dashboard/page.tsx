@@ -7,23 +7,25 @@ import { MessagesPanel } from '@/components/overlapse/messages';
 import { SchedulePanel } from '@/components/overlapse/schedule';
 import { CalendarPanel } from '@/components/overlapse/calendar-panel';
 import { UpcomingMeetings } from '@/components/overlapse/upcoming-meetings';
+import { ProfileMenu } from '@/components/overlapse/profile-menu';
+import { WorldClock } from '@/components/overlapse/world-clock';
 import Toaster, { ToasterRef } from '@/components/ui/toast';
-import { Search, User, Globe, RotateCcw, Layers, MapPin } from 'lucide-react';
+import { User, Clock } from 'lucide-react';
 
-const MapboxGlobe = dynamic(() => import('@/components/overlapse/MapboxGlobe').then(m=>m.default), { ssr: false, loading: () => <div className="h-[520px] rounded-[28px] bg-[#0b0c10] border border-white/10 flex items-center justify-center text-zinc-500 text-xs" style={{fontFamily:'"Fragment Mono",monospace'}}>loading Mapbox GL…</div> });
+const WorldGlobe = dynamic(() => import('@/components/overlapse/WorldGlobe').then(m=>m.default), { ssr: false, loading: () => <div className="h-[520px] rounded-[28px] bg-[#0b0c10] border border-white/10 flex items-center justify-center text-zinc-500 text-xs" style={{fontFamily:'"Fragment Mono",monospace'}}>loading Globe.gl…</div> });
 
 export default function DashboardPage() {
   const toasterRef = useRef<ToasterRef>(null);
   const [focusLabel, setFocusLabel] = useState('World');
-  const [focusCoords, setFocusCoords] = useState({ lat: -34.6, lng: -58.4, zoom: 2 });
   const [autoRotate, setAutoRotate] = useState(false);
+  const [showWorldClock, setShowWorldClock] = useState(false);
 
   const pins = [
-    { id: '1', lat: -34.6118, lng: -58.396, label: 'Buenos Aires', color: '#ff6a1a', size: 1 },
-    { id: '2', lat: -31.42, lng: -64.18, label: 'Córdoba', color: '#00e0ff', size: 0.8 },
-    { id: '3', lat: 40.7128, lng: -74.006, label: 'New York', color: '#7cffb0', size: 0.8 },
-    { id: '4', lat: 35.6762, lng: 139.65, label: 'Tokyo', color: '#ffd166', size: 0.8 },
-    { id: '5', lat: 51.0504, lng: 13.7373, label: 'Dresden', color: '#c084fc', size: 0.8 },
+    { id: '1', lat: -34.6118, lng: -58.396, label: 'Buenos Aires', color: '#ff6a1a', size: 1, timezone: 'America/Argentina/Buenos_Aires' },
+    { id: '2', lat: -31.42, lng: -64.18, label: 'Córdoba', color: '#00e0ff', size: 0.8, timezone: 'America/Argentina/Cordoba' },
+    { id: '3', lat: 40.7128, lng: -74.006, label: 'New York', color: '#7cffb0', size: 0.8, timezone: 'America/New_York' },
+    { id: '4', lat: 35.6762, lng: 139.65, label: 'Tokyo', color: '#ffd166', size: 0.8, timezone: 'Asia/Tokyo' },
+    { id: '5', lat: 51.0504, lng: 13.7373, label: 'Dresden', color: '#c084fc', size: 0.8, timezone: 'Europe/Berlin' },
   ];
 
   return (
@@ -39,25 +41,19 @@ export default function DashboardPage() {
             <a href="/dashboard" className="text-[#00e0ff]">Mission</a>
             <a href="/groups" className="hover:text-white">Groups</a>
             <a href="/meetings" className="hover:text-white">Meetings</a>
-            <a href="/settings" className="hover:text-white">PRD</a>
+            <a href="/settings" className="hover:text-white">Settings</a>
             <a href="/" className="hover:text-white">Landing</a>
           </nav>
-          <div className="flex-1 flex justify-center">
-            <div className="w-full max-w-[560px] relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-              <input
-                placeholder="⌕ Search The World"
-                className="w-full bg-white/[0.03] border border-white/[0.09] rounded-full pl-9 pr-4 py-[9px] text-[12px] text-zinc-300 placeholder-zinc-500 outline-none focus:border-[#00e0ff]/50"
-              />
-            </div>
-          </div>
+          <div className="flex-1" />
           <button
-            onClick={() => toasterRef.current?.show({ title: 'Account', message: 'Supabase Auth • is_premium = false', variant: 'default' })}
-            className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center hover:border-[#ff6a1a]/60"
-            aria-label="Account"
+            onClick={() => setShowWorldClock(true)}
+            className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center hover:border-[#00e0ff]/60 transition-colors"
+            aria-label="Open world clock"
+            title="World clock"
           >
-            <User className="w-4 h-4 text-zinc-400" />
+            <Clock className="w-4 h-4 text-zinc-400" />
           </button>
+          <ProfileMenu />
         </div>
       </header>
 
@@ -70,22 +66,19 @@ export default function DashboardPage() {
 
         {/* Center – Globe */}
         <section className="col-span-12 lg:col-span-6 xl:col-span-7">
-          <MapboxGlobe
+          <WorldGlobe
             pins={pins}
-            focus={{ ...focusCoords, label: focusLabel }}
             height={520}
             autoRotate={autoRotate}
             onAutoRotateChange={setAutoRotate}
-            onLocationChange={(loc) => {
-              setFocusCoords({ lat: loc.lat, lng: loc.lng, zoom: loc.zoom });
-              setFocusLabel(loc.label);
+            onLocationChange={(label) => {
+              setFocusLabel(label);
             }}
             onPinClick={(p)=>{
-              setFocusCoords({lat:p.lat, lng:p.lng, zoom: 6});
               setFocusLabel(p.label);
               toasterRef.current?.show({
                 title: `Focused: ${p.label}`,
-                message: `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)} • Mapbox GL`,
+                message: `${p.lat.toFixed(2)}, ${p.lng.toFixed(2)} • Globe.gl`,
                 variant: 'default',
                 duration: 2200
               });
@@ -168,8 +161,10 @@ export default function DashboardPage() {
         </section>
       </main>
 
+      <WorldClock isOpen={showWorldClock} onClose={() => setShowWorldClock(false)} />
+
       <footer className="border-t border-white/10 mt-10 py-8 text-center text-[10px] text-zinc-500" style={{fontFamily:'"Fragment Mono", monospace'}}>
-        Overlapse — timezone mission control • #0a0a0f • #ff6a1a • #00e0ff • Fragment Mono / Departure Mono • Supabase • Mapbox GL • Vercel
+        Overlapse — timezone mission control • #0a0a0f • #ff6a1a • #00e0ff • Fragment Mono • Supabase • Globe.gl • Esri
       </footer>
     </div>
   );
