@@ -6,6 +6,7 @@
 -- Plus the world_clock_cities column added for Phase 3
 -- ============================================================
 
+
 -- ============================================================
 -- 1. profiles — one row per authenticated user
 -- ============================================================
@@ -21,7 +22,9 @@ create table if not exists public.profiles (
   last_active_at timestamptz default now()
 );
 
+
 comment on table public.profiles is 'User profiles — extends Supabase auth.users with Overlapse-specific fields';
+
 
 -- ============================================================
 -- 2. groups — a coordination circle
@@ -36,7 +39,9 @@ create table if not exists public.groups (
   created_at timestamptz not null default now()
 );
 
+
 comment on table public.groups is 'Coordination groups — circle of friends/collaborators sharing meeting coordination';
+
 
 -- ============================================================
 -- 3. group_members — per-member timezone + work/home hours
@@ -52,7 +57,9 @@ create table if not exists public.group_members (
   primary key (group_id, user_id)
 );
 
+
 comment on table public.group_members is 'Group membership with member timezone and work hours for Golden Hours computation';
+
 
 -- ============================================================
 -- 4. meeting_blocks — proposed or confirmed meeting windows
@@ -69,7 +76,9 @@ create table if not exists public.meeting_blocks (
   created_at timestamptz not null default now()
 );
 
+
 comment on table public.meeting_blocks is 'Meeting time proposals — draggable or fixed, confirmed or pending';
+
 
 -- ============================================================
 -- 5. suggestions — real-time time-change proposals with reasons
@@ -85,7 +94,9 @@ create table if not exists public.suggestions (
   created_at timestamptz not null default now()
 );
 
+
 comment on table public.suggestions is 'Real-time meeting time-change suggestions with reason field';
+
 
 -- ============================================================
 -- 6. notifications — in-app notification log
@@ -99,7 +110,9 @@ create table if not exists public.notifications (
   created_at timestamptz not null default now()
 );
 
+
 comment on table public.notifications is 'In-app notification log — used for the bell-icon dropdown';
+
 
 -- ============================================================
 -- 7. saved_locations — pins on the hero globe
@@ -115,7 +128,9 @@ create table if not exists public.saved_locations (
   created_at timestamptz not null default now()
 );
 
+
 comment on table public.saved_locations is 'User-saved globe pin locations';
+
 
 -- ============================================================
 -- Indexes for performance
@@ -130,9 +145,11 @@ create index if not exists idx_notifications_user_unread on public.notifications
 create index if not exists idx_saved_locations_user on public.saved_locations(user_id);
 create index if not exists idx_profiles_last_active on public.profiles(last_active_at);
 
+
 -- ============================================================
 -- Row Level Security
 -- ============================================================
+
 
 alter table public.profiles enable row level security;
 alter table public.groups enable row level security;
@@ -142,22 +159,27 @@ alter table public.suggestions enable row level security;
 alter table public.notifications enable row level security;
 alter table public.saved_locations enable row level security;
 
+
 -- ============================================================
 -- RLS Policies
 -- ============================================================
+
 
 -- profiles: users can read/update only their own profile
 drop policy if exists "users read own profile" on public.profiles;
 create policy "users read own profile" on public.profiles
   for select using (auth.uid() = id);
 
+
 drop policy if exists "users update own profile" on public.profiles;
 create policy "users update own profile" on public.profiles
   for update using (auth.uid() = id);
 
+
 drop policy if exists "users insert own profile" on public.profiles;
 create policy "users insert own profile" on public.profiles
   for insert with check (auth.uid() = id);
+
 
 -- groups: members can read groups they belong to; creators can insert/update
 drop policy if exists "members read own groups" on public.groups;
@@ -167,17 +189,21 @@ create policy "members read own groups" on public.groups
     or created_by = auth.uid()
   );
 
+
 drop policy if exists "creators insert groups" on public.groups;
 create policy "creators insert groups" on public.groups
   for insert with check (created_by = auth.uid());
+
 
 drop policy if exists "creators update groups" on public.groups;
 create policy "creators update groups" on public.groups
   for update using (created_by = auth.uid());
 
+
 drop policy if exists "creators delete groups" on public.groups;
 create policy "creators delete groups" on public.groups
   for delete using (created_by = auth.uid());
+
 
 -- group_members: members can read membership rows for their groups; can update own; admins can manage
 drop policy if exists "members read own membership rows" on public.group_members;
@@ -187,17 +213,21 @@ create policy "members read own membership rows" on public.group_members
     or group_id in (select group_id from public.group_members where user_id = auth.uid())
   );
 
+
 drop policy if exists "users insert own membership" on public.group_members;
 create policy "users insert own membership" on public.group_members
   for insert with check (user_id = auth.uid());
+
 
 drop policy if exists "users update own membership" on public.group_members;
 create policy "users update own membership" on public.group_members
   for update using (user_id = auth.uid());
 
+
 drop policy if exists "users delete own membership" on public.group_members;
 create policy "users delete own membership" on public.group_members
   for delete using (user_id = auth.uid());
+
 
 -- meeting_blocks: members can read meetings for their groups; creators can insert/update
 drop policy if exists "members read group meetings" on public.meeting_blocks;
@@ -206,12 +236,14 @@ create policy "members read group meetings" on public.meeting_blocks
     group_id in (select group_id from public.group_members where user_id = auth.uid())
   );
 
+
 drop policy if exists "members insert group meetings" on public.meeting_blocks;
 create policy "members insert group meetings" on public.meeting_blocks
   for insert with check (
     created_by = auth.uid()
     and group_id in (select group_id from public.group_members where user_id = auth.uid())
   );
+
 
 drop policy if exists "creators update meetings" on public.meeting_blocks;
 create policy "creators update meetings" on public.meeting_blocks
@@ -223,6 +255,7 @@ create policy "creators update meetings" on public.meeting_blocks
     )
   );
 
+
 drop policy if exists "creators delete meetings" on public.meeting_blocks;
 create policy "creators delete meetings" on public.meeting_blocks
   for delete using (
@@ -232,6 +265,7 @@ create policy "creators delete meetings" on public.meeting_blocks
       where user_id = auth.uid() and role = 'admin'
     )
   );
+
 
 -- suggestions: members can read suggestions for meetings in their groups; members can insert
 drop policy if exists "members read group suggestions" on public.suggestions;
@@ -245,6 +279,7 @@ create policy "members read group suggestions" on public.suggestions
     )
   );
 
+
 drop policy if exists "members insert suggestions" on public.suggestions;
 create policy "members insert suggestions" on public.suggestions
   for insert with check (
@@ -257,31 +292,38 @@ create policy "members insert suggestions" on public.suggestions
     )
   );
 
+
 drop policy if exists "suggesters update own suggestions" on public.suggestions;
 create policy "suggesters update own suggestions" on public.suggestions
   for update using (suggested_by = auth.uid());
 
+
 drop policy if exists "suggesters delete own suggestions" on public.suggestions;
 create policy "suggesters delete own suggestions" on public.suggestions
   for delete using (suggested_by = auth.uid());
+
 
 -- notifications: users read/manage only their own
 drop policy if exists "users read own notifications" on public.notifications;
 create policy "users read own notifications" on public.notifications
   for select using (user_id = auth.uid());
 
+
 drop policy if exists "users update own notifications" on public.notifications;
 create policy "users update own notifications" on public.notifications
   for update using (user_id = auth.uid());
+
 
 drop policy if exists "users delete own notifications" on public.notifications;
 create policy "users delete own notifications" on public.notifications
   for delete using (user_id = auth.uid());
 
+
 -- saved_locations: users manage only their own pins
 drop policy if exists "users manage own saved locations" on public.saved_locations;
 create policy "users manage own saved locations" on public.saved_locations
   for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+
 
 -- ============================================================
 -- Trigger: auto-create profile on user signup
@@ -304,36 +346,65 @@ begin
 end;
 $$;
 
+
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- ============================================================
--- Trigger: update last_active_at on profile reads (best-effort)
--- ============================================================
-create or replace function public.update_last_active()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  update public.profiles set last_active_at = now() where id = auth.uid();
-  return new;
-end;
-$$;
 
-drop trigger if exists on_profile_read on public.profiles;
-create trigger on_profile_read
-  after select on public.profiles
-  for each statement execute function public.update_last_active();
+-- ============================================================
+-- NOTE: The original "update last_active_at on profile read" trigger
+-- has been REMOVED. PostgreSQL does NOT support AFTER SELECT triggers —
+-- SELECT is not a valid trigger event (only INSERT, UPDATE, DELETE,
+-- TRUNCATE are). That was the root cause of the 42601 syntax error.
+--
+-- Recommended replacement: update last_active_at from your application
+-- layer (e.g. an RPC call or Edge Function on login/session refresh),
+-- for example:
+--
+--   create or replace function public.touch_last_active()
+--   returns void
+--   language plpgsql
+--   security definer set search_path = public
+--   as $$
+--   begin
+--     update public.profiles set last_active_at = now() where id = auth.uid();
+--   end;
+--   $$;
+--
+-- Then call it from the client via supabase.rpc('touch_last_active')
+-- whenever the user opens the app or their session refreshes.
+-- ============================================================
+
 
 -- ============================================================
 -- Realtime: enable for key tables
 -- ============================================================
-alter publication supabase_realtime add table public.suggestions;
-alter publication supabase_realtime add table public.meeting_blocks;
-alter publication supabase_realtime add table public.notifications;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'suggestions'
+  ) then
+    alter publication supabase_realtime add table public.suggestions;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'meeting_blocks'
+  ) then
+    alter publication supabase_realtime add table public.meeting_blocks;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'notifications'
+  ) then
+    alter publication supabase_realtime add table public.notifications;
+  end if;
+end $$;
+
 
 -- ============================================================
 -- Done. Verify with:
